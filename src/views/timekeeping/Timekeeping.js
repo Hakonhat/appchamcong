@@ -6,18 +6,19 @@ const { width, height } = Dimensions.get('screen');
 const URL_RECOGNITION = require('../api/time').URL_RECOGNITION;
 import { registerRecognition } from '../api/index';
 import HistoryContext from './HistoryContext';
+import { useNavigation } from '@react-navigation/native';
 
 
 const Timekeeping = () => {
   const currentDate = new Date();
-
+  const navigation = useNavigation();
   const ngayTrongTuan = currentDate.toLocaleDateString('vi-VN', { weekday: 'long' });
   const [capturedImages, setCapturedImages] = useState([]);
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
   const [anhChup, setAnhChup] = useState(null);
   const { addRecordToHistory } = useContext(HistoryContext);
-
+  const currentTime = new Date().toLocaleTimeString('vi-VN');
   let cameraRef = null;
 
   const handleDeleteImage = (index) => {
@@ -39,6 +40,8 @@ const Timekeeping = () => {
       setCapturedImages([...capturedImages, data.uri]);
       setAnhChup(data.uri);
       setShowCamera(false);
+    
+      addRecordToHistory(currentTime);
     }
   };
 
@@ -55,8 +58,6 @@ const Timekeeping = () => {
       setCapturedImages([]);
       setAnhChup(null);
       Alert.alert('Thông báo', 'Gửi ảnh thành công.');
-      const currentTime = new Date().toLocaleTimeString('vi-VN');
-      addRecordToHistory(currentTime);
     } catch (error) {
       console.error(error);
       Alert.alert('Thông báo', 'Đã có lỗi xảy ra khi gửi ảnh.');
@@ -101,14 +102,16 @@ const Timekeeping = () => {
             ))}
           </View>
           <View style={styles.horizontalButtonRow}>
-           <TouchableOpacity style={[styles.button, { marginRight: 10 }]} onPress={() => setShowCamera(takePicture)}>
-              <Text style={styles.buttonText}>Chụp ảnh</Text>
-             </TouchableOpacity>
-           <TouchableOpacity style={styles.button} onPress={() => sendImageToServer(URL_RECOGNITION)}>
-               <Text style={styles.buttonText}>Gửi Ảnh</Text>
-           </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={async() => {
+                  await setShowCamera(takePicture)
+                  await sendImageToServer(URL_RECOGNITION);
+              }}>
+            <Text style={styles.buttonText}>Chấm công</Text>
+              </TouchableOpacity>
            </View>
+           <Button title="Quay lại"  onPress={() => navigation.navigate('Splash')} />
         </View>
+        
       </View>
     </ScrollView>
   );

@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import History from "../views/timekeeping/History";
 import HistoryContext from "../views/timekeeping/HistoryContext";
 import HistoryProvider from "../views/timekeeping/HistoryProvider";
+import { AppProvider } from "../views/setting/AppContext";
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 // const drawer=createDrawerNavigator();
@@ -64,15 +66,6 @@ const HomeDrawer = () => {
           )
         }}
       />
-      <Tab.Screen
-        name="Chấm Công"
-        component={Timekeeping}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={32} color={color} />
-          )
-        }}
-      />
        <Tab.Screen
         name="Lịch sử chấm công"
         component={History}
@@ -97,17 +90,20 @@ const HomeDrawer = () => {
 
 export default function App() {
   return (
+    <AppProvider>
     <HistoryProvider>
     <NavigationContainer independent={true}>
       <Stack.Navigator  initialRouteName="Splash" screenOptions={{
         headerShown: false
       }}>
         <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="HomeDrawer" component={HomeDrawer} />
         <Stack.Screen name="Timekeeping" component={Timekeeping} />
        <Stack.Screen name="History" component={History} />
       </Stack.Navigator>
     </NavigationContainer>
      </HistoryProvider>
+     </AppProvider>
   );
 }
